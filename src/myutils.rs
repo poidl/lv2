@@ -1,15 +1,15 @@
+extern crate lv2_raw;
 use libc;
-use core::*;
 use std::ffi::CStr;
 use std::str;
 
-pub fn mapfeature(hostfeatures: *const (*const LV2Feature),
+pub fn mapfeature(hostfeatures: *const (*const lv2_raw::LV2Feature),
                   requiredfeature: &str)
                   -> Result<*mut libc::c_void, &str> {
     let mut x: isize = 0;
     unsafe {
         loop {
-            let fptr: *const LV2Feature = *hostfeatures.offset(x);
+            let fptr: *const lv2_raw::LV2Feature = *hostfeatures.offset(x);
             if fptr.is_null() {
                 // host doesn't provide feature
                 break;
@@ -35,13 +35,13 @@ pub fn cstring<'a>(ptr: *const libc::c_char) -> &'a str {
     }
 }
 
-pub fn print_features(features: *const (*const LV2Feature)) {
+pub fn print_features(features: *const (*const lv2_raw::LV2Feature)) {
     // Print lv2 host features
     let mut x: isize = 0;
     unsafe {
         loop {
 
-            let fptr: *const LV2Feature = *features.offset(x);
+            let fptr: *const lv2_raw::LV2Feature = *features.offset(x);
             if fptr.is_null() {
                 println!("End of features");
                 break;

@@ -1,10 +1,14 @@
+extern crate lv2_raw;
 use libc;
 use std::ptr;
 use std::mem;
 use std::slice;
-// use std::marker::PhantomData;
 
-pub trait LV2HandleNew<'a> {
+/// A group of plugin methods that are defined by the plugin and called
+/// by the host.
+pub trait LV2Plugin<'a> {
+    /// Does everything `instantiate()` does in the C code, except allocating
+    /// memory.
     fn initialize(&mut self) {}
     fn connect_port(&mut self, _port: u32, _data: &'a mut [f32]) {}
     fn activate(&mut self) {}
@@ -13,36 +17,11 @@ pub trait LV2HandleNew<'a> {
     fn cleanup(&mut self) {}
 }
 
-pub type LV2Handle = *mut libc::c_void;
-
-#[repr(C)]
-pub struct LV2Feature {
-    pub uri: *const libc::c_char,
-    pub data: *mut libc::c_void, // pub data: *mut LV2UridMap,
-}
-
-#[repr(C)]
-pub struct LV2Descriptor {
-    pub uri: *const libc::c_char,
-    pub instantiate: extern "C" fn(descriptor: *const LV2Descriptor,
-                                   rate: f64,
-                                   bundle_path: *const libc::c_char,
-                                   features: *const (*const LV2Feature))
-                                   -> LV2Handle,
-    pub connect_port: extern "C" fn(handle: LV2Handle, port: u32, data: *mut libc::c_void),
-    pub activate: Option<extern "C" fn(instance: LV2Handle)>,
-    pub run: extern "C" fn(instance: LV2Handle, n_samples: u32),
-    pub deactivate: Option<extern "C" fn(instance: LV2Handle)>,
-    pub cleanup: extern "C" fn(instance: LV2Handle),
-    pub extension_data: extern "C" fn(uri: *const u8) -> (*const libc::c_void),
-}
-
-
-pub extern "C" fn instantiate<'a, T: LV2HandleNew<'a>>(_descriptor: *const LV2Descriptor,
-                                                       _rate: f64,
-                                                       _bundle_path: *const i8,
-                                                       _features: *const *const LV2Feature)
-                                                       -> LV2Handle {
+pub extern "C" fn instantiate<'a, T: LV2Plugin<'a>>(_descriptor: *const lv2_raw::LV2Descriptor,
+                                                    _rate: f64,
+                                                    _bundle_path: *const i8,
+                                                    _features: *const *const lv2_raw::LV2Feature)
+                                                    -> lv2_raw::LV2Handle {
 
     let ptr: *mut libc::c_void;
     unsafe {
@@ -53,30 +32,31 @@ pub extern "C" fn instantiate<'a, T: LV2HandleNew<'a>>(_descriptor: *const LV2De
     return ptr;
 }
 
-pub extern "C" fn connect_port<'a, T: LV2HandleNew<'a>>(handle: LV2Handle,
-                                                        port: u32,
-                                                        data: *mut libc::c_void) {
+pub extern "C" fn connect_port<'a, T: LV2Plugin<'a>>(handle: lv2_raw::LV2Handle,
+                                                     port: u32,
+                                                     data: *mut libc::c_void) {
     let d = data as *mut f32;
     let plgptr = handle as *mut T;
     unsafe {
-        // TODO: This should be sample_count. How do we get that number? During initialization?
-        let bs: &mut [f32] = slice::from_raw_parts_mut(d, 256 * mem::size_of::<f32>());
+        // TODO: This should be sample_count. How do we get that number? During initialization? Set to some random (high) number.
+        // https://www.alsa-project.org/main/index.php/FramesPeriods
+        let bs: &mut [f32] = slice::from_raw_parts_mut(d, 65536 * mem::size_of::<f32>());
         (*plgptr).connect_port(port, bs)
     }
 }
 
-pub extern "C" fn activate(_instance: LV2Handle) {}
-pub extern "C" fn run<'a, T: LV2HandleNew<'a>>(instance: LV2Handle, n_samples: u32) {
+pub extern "C" fn activate(_instance: lv2_raw::LV2Handle) {}
+pub extern "C" fn run<'a, T: LV2Plugin<'a>>(instance: lv2_raw::LV2Handle, n_samples: u32) {
     let plgptr = instance as *mut T;
     unsafe { (*plgptr).run(n_samples) }
 }
 
-pub extern "C" fn deactivate(_instance: LV2Handle) {}
-pub extern "C" fn cleanup(instance: LV2Handle) {
+pub extern "C" fn deactivate(_instance: lv2_raw::LV2Handle) {}
+pub extern "C" fn cleanup(instance: lv2_raw::LV2Handle) {
 
     unsafe {
         // ptr::read(instance as *mut Amp); // no need for this?
-        libc::free(instance as LV2Handle)
+        libc::free(instance as lv2_raw::LV2Handle)
     }
 }
 pub extern "C" fn extension_data(_uri: *const u8) -> (*const libc::c_void) {

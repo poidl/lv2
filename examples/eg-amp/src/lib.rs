@@ -37,7 +37,7 @@ pub struct AmpNew<'a> {
 
 // I'd say NO, because:
 
-// I want to implement "lv2::LV2HandleNew"
+// I want to implement "lv2::LV2Plugin"
 // without having to use "unsafe", i.e. to "provide a safe interface" to the
 // lv2 library. What is the correct (let's say idiomatic) way to "provide a safe
 // interface"?
@@ -63,7 +63,7 @@ pub struct AmpNew<'a> {
 // to "slice::from_raw_parts_mut()" without having to worry about perfomance/space,
 // since no resources are actually allocated anyways, right?
 
-impl<'a> lv2::LV2HandleNew<'a> for AmpNew<'a> {
+impl<'a> lv2::LV2Plugin<'a> for AmpNew<'a> {
     // For now, initialize() is a placeholder function that doesn't do anything. More complicated plugins may scan host features, set a sample rate, etc.
     fn initialize(&mut self) {}
     fn connect_port(&mut self, port: u32, data: &'a mut [f32]) {
@@ -130,17 +130,17 @@ pub extern "C" fn lv2_descriptor(index: i32) -> *const lv2::LV2Descriptor {
     }
 }
 
-// fn instantiate<T>() -> *mut libc::c_void {
-//     let ptr: *mut libc::c_void;
+// fn instantiate<T>() -> lv2_raw::LV2Handle {
+//     let ptr: lv2_raw::LV2Handle;
 //     unsafe {
-//         ptr = libc::malloc(mem::size_of::<T>() as libc::size_t) as *mut libc::c_void;
+//         ptr = libc::malloc(mem::size_of::<T>() as libc::size_t) as lv2_raw::LV2Handle;
 //         let plgptr = ptr as *mut T;
 //     }
 //     ptr
 // }
 
 // impl<'a> AmpNew<'a> {
-//     fn new_ptr() -> *mut libc::c_void {
+//     fn new_ptr() -> lv2_raw::LV2Handle {
 //         instantiate::<AmpNew>()
 //     }
 // }

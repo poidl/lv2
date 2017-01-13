@@ -1,6 +1,6 @@
 [package]
 name = "lv2"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["poidl <hoitaus@gmail.com>"]
 description = "Minimal LV2 interface for Rust"
 
@@ -25,3 +25,4 @@ license = "ISC"
 
 [dependencies]
 libc = "0"
+lv2_raw = "0.1.0"
