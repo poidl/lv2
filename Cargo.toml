@@ -25,4 +25,5 @@ license = "ISC"
 
 [dependencies]
 libc = "0"
-lv2_raw = "0.1.0"
+#lv2_raw = "0.1.0"
+lv2_raw = { path = "../lv2_raw"}
