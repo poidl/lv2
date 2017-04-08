@@ -14,11 +14,7 @@ The [lv2_raw crate](https://crates.io/crates/lv2_raw) tries to provide a
 more low-level "verbatim" (i.e. C-like) translation of the C interface.
 That crate may be more useful for your project.
 
-The original (C language) LV2 package defines contains some "helper" functions,
-which are defined in C-headers. As temporary solution, this crate contains
-some of those functions, although they may not correspond to idiomatic Rust.
-The documentation of these functions is copied from the original C files, whose
-copyright holders include Steve Harris, Lars Luthman, Gabriel M. Beddingfield,
+Copyright holders of the original C code include Steve Harris, Lars Luthman, Gabriel M. Beddingfield,
 David Robillard, Richard W.E. Furse, Paul Barton-Davis, Stefan Westerfeld, and
 possibly others.
 
