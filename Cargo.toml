@@ -27,3 +27,7 @@ license = "ISC"
 libc = "0"
 #lv2_raw = "0.1.0"
 lv2_raw = { path = "../lv2_raw"}
+
+[[example]]
+name = "eg_amp_rust"
+crate-type = ["cdylib"]

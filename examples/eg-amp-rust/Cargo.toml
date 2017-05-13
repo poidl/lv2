@@ -8,5 +8,5 @@ lv2 = { path = "../.." }
 libc = "0"
 
 [lib]
-name = "amp_rust"
-crate-type = ["dylib"] # ?
+name = "eg-amp-rust"
+crate-type = ["cdylib"] # ?

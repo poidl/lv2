@@ -15,4 +15,4 @@ pub use lv2_raw::atom::*;
 pub use lv2_raw::ui::*;
 pub use lv2_raw::midi::*;
 pub use lv2_raw::urid::*;
-pub use lv2_raw::utils::*;
+pub use lv2_raw::atomutils::*;

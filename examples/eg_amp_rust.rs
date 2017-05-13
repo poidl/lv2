@@ -103,7 +103,7 @@ type Newtype<'a> = AmpNew<'a>;
 // A secondary question is: Is this necessary? How to implement this more
 // effectively?
 
-static S: &'static [u8] = b"http://example.org/eg-amp_rust\0";
+static S: &'static [u8] = b"http://example.org/eg-amp-rust\0";
 static mut DESC: lv2::LV2Descriptor = lv2::LV2Descriptor {
     uri: 0 as *const libc::c_char, // ptr::null() isn't const fn (yet)
     instantiate: lv2::instantiate::<Newtype>,
